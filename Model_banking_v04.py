@@ -1,3 +1,5 @@
+import os 
+import random 
 Ac_No=10001
 User_Id = 98001
 Customer_Id = 2001
@@ -53,7 +55,7 @@ def Read_User_info():
     C_file.close()
     return A
  
-###.......................Read balance info ............###
+###.......................Read balance info ............### 
 def Read_Balance_info():
     B_file= open("Balance_info.txt","r")
     P =B_file.readlines()
@@ -62,6 +64,10 @@ def Read_Balance_info():
 
     #.................................................Creating New customer Account ....................................#
 def New_Customer_Bank_Ac ():
+    Ac_No =Ac_numbers()
+    Us_Id =Us_numbers()
+    Cu_Id =Cu_numbers()
+    now = date_time()
     while True :
         try:
             Name = input ("Enter the Name: ")
@@ -69,62 +75,66 @@ def New_Customer_Bank_Ac ():
             Gender = input("Male or Female :")
             Address = input("Enter the Address: ")
             Balance =int(input("Enter the initial Deposit Value : "))
-            #.......Password varification ........#
-            while True:
+            
+        except ValueError:
+                    print("Enter numbers only!!!")    
+        
+        #.......Password varification ........#
+        while True:
+            try:
                 Password = int (input ("Enter 4 digit number password : ") )
                 Conform_Password = int(input("Reenter the 4 digit number Password "))
-                if Password==Conform_Password and Password>999 and Password < 10000:
-                    Ok=input ("Type Yes for any changes, If not No :")
-                    if Ok =="Yes" or Ok =="yes":
-                        print ("Be carefull while entering!!!")    
-                        New_Customer_Bank_Ac()    
-                break 
-   
-        except ValueError:
-            print("Enter numbers only!!!")
-            
-        print ("Your Account is created Sucessfully..")
-        Ac_No =Ac_numbers()
-        Us_Id =Us_numbers()
-        Cu_Id =Cu_numbers()
-        now = date_time()
-    #............Adding the user input in file .............#
-        file = open("User_info.txt","a")
-        file.write(f"U{Us_Id},")
-        file.write(f"{now},")
-        file.write(f"{Name},")
-        file.write(f"{Password},\n")
-        file.close()     
-    
-    #............  Adding the customer input to C_file .......#
-        C_file=open ("Customer_Info.txt","a")
-        C_file.write(f"C{Cu_Id},")
-        C_file.write(f"{now},")
-        C_file.write(f"{Name},")
-        C_file.write(f"{Age},")
-        C_file.write(f"{Gender},")
-        C_file.write(f"{Address},")
-        C_file.write(f"Ac{Ac_No},")
-        C_file.write(f"U{Us_Id},\n")
-        C_file.close()
+            except ValueError:
+                print("Enter numbers only!!!")   
+            if Password==Conform_Password and Password>999 and Password < 10000:
+                Ok=input ("Type Yes for any changes, If not No :")
+                if Ok =="Yes" or Ok =="yes":
+                    print ("Be carefull while entering!!!")   
+                    #New_Customer_Bank_Ac() 
+                    continue
+                else:
+                    print ("Your Account is created Sucessfully..")
+                #............Adding the user input in file .............#
+                    file = open("User_info.txt","a")
+                    file.write(f"U{Us_Id},")
+                    file.write(f"{now},")
+                    file.write(f"{Name},")
+                    file.write(f"{Password},\n")
+                    file.close()     
 
-        
-    #............  Adding the Balance input to B_file .......#
-        B_file  = open("Balance_info.txt","a")
-        B_file.write(f"Ac{Ac_No},")
-        B_file.write(f"{now},")
-        B_file .write(f"{Balance},")
-        B_file.write(f"U{Us_Id},\n")
-        B_file .close()   
+                #............  Adding the customer input to C_file .......#
+                    C_file=open ("Customer_Info.txt","a")
+                    C_file.write(f"C{Cu_Id},")
+                    C_file.write(f"{now},")
+                    C_file.write(f"{Name},")
+                    C_file.write(f"{Age},")
+                    C_file.write(f"{Gender},")
+                    C_file.write(f"{Address},")
+                    C_file.write(f"Ac{Ac_No},")
+                    C_file.write(f"U{Us_Id},\n")
+                    C_file.close()
+
+                    
+                #............  Adding the Balance input to B_file .......#
+                    B_file  = open("Balance_info.txt","a")
+                    B_file.write(f"Ac{Ac_No},")
+                    B_file.write(f"{now},")
+                    B_file .write(f"{Balance},")
+                    B_file.write(f"U{Us_Id},\n")
+                    B_file .close() 
+                    break
         break
-        
+
+            
+                    
+    
     ###...........Creating function for password protection and balance return  for customer menu.........###
 def Customer_check(Ac_No,name):
     Cu = Read_customer_info()
     for i in Cu:
         for x in i:
             cu=x.split(",")
-            if Ac_No == cu[6] and name==cu[2] :
+            if Ac_No ==int(cu[6]) and name==cu[2] :
                 print("Your Account Number is Correct !!!")
                 u = Read_User_info ()
                 for j in u :
@@ -155,19 +165,28 @@ def Customer_check(Ac_No,name):
 def get_Balance(Acc_number):     
     ba = Read_Balance_info()
     for x in ba :
-        for y in x :
-            if Acc_number == y[0]:
-                return y[2]  
-            else :
-                print ("Incorrect Account Number !!!")
+        m=x.split(",")
+        if Acc_number == m[0]:
+            bb =  m[2]
+            return bb  
+        
+
                 
 ###.........................................Function for withdraw and Deposit ......................###
-def with_dep(Balance,Amount,Menu_Num):
-    if Menu_Num==2 :
-        N_balance = Balance+Amount
-        print("Your amount is Deposited")
-        print(f"Your New Balance ia :{N_balance}")
-        return N_balance
+def Deposit(Amount):
+    Acc_number =input ("Enter the Account number :")
+    Balance = get_Balance(Acc_number)
+    New_Balance = int(Balance)+ int(Amount)
+    x=Read_Balance_info() #reading the balance file 
+    for i in x:
+        b=i.split(",")
+        if Acc_number==b[0]:
+            b[2]= New_Balance
+            
+            
+            print(f"Your Deposit is sucessful \n Your new Balance is {New_Balance}.")
+    
+       
       
 ###................................Admin Menu- Driven Interface .......................................................###
 
@@ -185,22 +204,17 @@ def Admin_Menu():
         print("8= Total Transaction History ")
         print("9= Exit ")
         
-        Menu_Num = int(input ("Enter the Menu Number "))
+        Menu_Num = int(input ("Enter the Menu Number :"))
         if Menu_Num == 1 :
             New_Customer_Bank_Ac() 
         elif Menu_Num==2:
             try :
-                Acc_number =input ("Enter the Account number :")
-                Balance = get_Balance(Acc_number)
-                Amount =int (input ("Enter the Amount to Deposit"))
-                if Amount < Balance :
-                    with_dep(Balance,Amount,Menu_Num)
-                    
-                else :
-                    print ("Not sufficient Amount !!!")
+                Amount =  input ("Enter the Amount to Deposit :")
+                Deposit(Amount) #New balance 
+                
             except ValueError:
-                print("Enter Numbers only !!!")
-            
+                print("Enter Numbers only !!!")               
+                
         elif Menu_Num==3 :
             pass
         elif Menu_Num==4:
@@ -208,10 +222,11 @@ def Admin_Menu():
         elif Menu_Num==5:
             pass
         elif Menu_Num==6:
-            print ("Thank you for using our Mini banking !!!")
+            print ("Thank you for using our Mini banking ")
             break
         else :
             print("Invalid Customer menu number!!!") 
+            
              
 #................Creating Admin Account ..........#
 def Admin ():
@@ -242,9 +257,14 @@ def Admin ():
     file.close()
     
 def First_Interface():
-    for i in range(1):
-        print("Create your Admin Account!")
-        Ad_Ac= Admin ()
+    if os.path.isfile("Admin_Infomation.txt"):
+        Second_Interface()
+    else :
+        for i in range(1):
+            print("Create your Admin Account!")
+            Ad_Ac= Admin ()
+        
+        
         
         
 def Second_Interface ():
@@ -264,14 +284,16 @@ def Second_Interface ():
                 if Ad_Id== Ad_info[2] and Ad_pass==Ad_info[3]:
                     print("Welcome Admin!!!")
                     Admin_Menu()
-                #else :
+                else :
                     print("Incorrect login Retry")
                     break
+                break
         elif INTPUT==2:
             #Customer_Menu()  
             pass         
         else :
             print("Enter the Valid Interface Number !!!")
+
     
 i=0     
 while True:

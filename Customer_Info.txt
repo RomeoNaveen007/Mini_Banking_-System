@@ -1,0 +1,2 @@
+C2001,2025-05-06,Naveen,24,Male,Karainagar,Ac10001,U98001,
+C2002,2025-05-06,Saipalavi,28,Female,Kerala,Ac10002,U98002,
