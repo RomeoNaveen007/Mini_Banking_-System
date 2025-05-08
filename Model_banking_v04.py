@@ -15,9 +15,9 @@ if os.path.isfile("Genarate_numbers.txt"):
         Customer_Id = int(Auto_numbers[2])
         Admin_Id = int(Auto_numbers[3])    
     else :
-        Ac_No,User_Id,Customer_Id,Admin_Id =  10001, 98001, 2001, 10010
+        Ac_No,User_Id,Customer_Id,Admin_Id =  10000, 98000, 2000, 10010
 else :
-    Ac_No,User_Id,Customer_Id,Admin_Id =  10001, 98001, 2001, 10010
+    Ac_No,User_Id,Customer_Id,Admin_Id =  10000, 98000, 2000, 10010
     
 ############..............Writing the Generated value in file ............##########
 def Regenerate_Numbers():
@@ -207,25 +207,35 @@ def find_user(Acc_number):
 ###.........................................Function for Deposit ......................###
 def Deposit(Amount):
     global Ac_No,User_Id,Customer_Id,Admin_Id
-    Acc_number =input ("Enter the Reciver Account number :")
+    Acc_number =input ("Enter the Account number :")
     Balance = get_Balance(Acc_number)
     if Balance is None :
         print("Account Not Found !!!")
-        return 
-    New_Balance = int(Balance)+ int(Amount)
-    x=Read_Balance_info() 
-    update=[]
-    for i in x:
-        b=i.split(",")
-        if Acc_number==b[0]:
-            b[2]= str (New_Balance)
-            print(f"Your Deposit is sucessful \n Your new Balance is {New_Balance}.")
-        update.append (",".join(b)) 
-    file =open("Balance_info.txt","w")
-    file.writelines(update)
-    file.close() 
-    find_user(Acc_number)
-    Regenerate_Numbers()      
+        return
+    else:  
+        New_Balance = int(Balance)+ int(Amount)
+        x=Read_Balance_info() 
+        update=[]
+        for i in x:
+            b=i.split(",")
+            if Acc_number==b[0]:
+                b[2]= str (New_Balance)
+                #x.remove(i)
+                print(f"Your Deposit is sucessful \n Your new Balance is {New_Balance}.")
+                break
+            
+            """file = open ("Balance_info.txt","w")
+            for a in x :
+                file.write (x)
+            file.close()"""
+            
+            
+        update.append (",".join(b))
+        file =open("Balance_info.txt","a")
+        file.write("".join(update))
+        file.close() 
+        find_user(Acc_number)
+        Regenerate_Numbers()                
 ###.........................................Function for Withdraw ......................### 
 def Withdraw(Amount):
     global Ac_No,User_Id ,Customer_Id,Admin_Id
@@ -237,7 +247,7 @@ def Withdraw(Amount):
         Bal = int(e[2])
         if Acount_num == e[0] and Bal < Amount:
             print(f"Your balance is {Bal} \n Amount not valid !!!")
-            break
+            return
             
         elif Acount_num == e[0] and Bal > Amount:
             new_balance = Bal -Amount
@@ -264,14 +274,50 @@ def Total_Balance():
 ###...........................................5. function Transfer Money .................###
 def Transfer_Money():
     global Ac_No,User_Id,Customer_Id,Admin_Id
-    Amount = int (input ("Enter the Amount to Transfer :"))
+    Amount = int (input ("Enter the transfer Amount :"))
     Dep_Ac_no = input("Enter the depositer Account Number :")
-    Rec_Ac_no =input ("Enter the Reciver's Account number : ")
-    Balance =get_Balance(Dep_Ac_no)
-    if Balance is None:
-        print("Account Not Found !!!")
-    Dep_New_Balance = int (Balance)- Amount 
-    x = Read_Balance_info()
+    Rec_Ac_no = input("Enter the Reciver's Account Number : ")
+    Dep_Balance =get_Balance(Dep_Ac_no)
+    Rec_Balance = get_Balance(Rec_Ac_no)
+    if Dep_Balance is None:
+        print(" Depositer Account Not Found !!!")
+        return
+    elif Rec_Balance is None :
+        print("Reciver Account Not Found !!!")
+        return
+        
+    else :
+        Dep_New_Balance = int (Dep_Balance)- Amount 
+        x = Read_Balance_info()
+        transfer = []
+        for i in x :
+            S = i .split (",")
+            if Dep_Ac_no == S[0]:
+                S[2]= str(Dep_New_Balance)
+            transfer.append(",".join(S))
+            file =open("Balance_info.txt","a")
+            file.writelines(transfer)
+            file.close() 
+            find_user(Dep_Ac_no)
+            Regenerate_Numbers() 
+            break
+        
+        Rec_New_Balance = int(Dep_Balance) + Amount 
+        y = Read_Balance_info()
+        new_Update = []
+        for j in y:
+            U = j.split(",")
+            if  Rec_Ac_no == U[0]:
+                U[2]= str(Rec_New_Balance)
+            new_Update.append(",".join(U))
+            file =open("Balance_info.txt","a")
+            file.writelines(new_Update)
+            file.close() 
+            find_user(Rec_Ac_no)
+            Regenerate_Numbers() 
+            break
+        return  
+ 
     
 
 ###................................Admin Menu- Driven Interface .......................................................###
@@ -312,7 +358,7 @@ def Admin_Menu():
             Total_Balance()
                    
         elif Menu_Num==5:
-            pass
+            Transfer_Money()
         elif Menu_Num==6:
             pass
         elif Menu_Num==7:
