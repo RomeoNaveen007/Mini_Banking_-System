@@ -206,36 +206,34 @@ def find_user(Acc_number):
        
 ###.........................................Function for Deposit ......................###
 def Deposit(Amount):
+    Balance=0
     global Ac_No,User_Id,Customer_Id,Admin_Id
     Acc_number =input ("Enter the Account number :")
-    Balance = get_Balance(Acc_number)
-    if Balance is None :
+    #Balance = get_Balance(Acc_number)
+    balance_Data =Read_Balance_info()
+    for a in balance_Data:
+        M = a.split(",")
+        if Acc_number == M[0]:
+            Balance = M[2]
+            balance_Data. remove (a)
+            file =open ("Balance_Info.txt","w")
+            file .writelines(balance_Data)
+            file .close ()
+            
+            
+    if int(Balance) == 0 :
         print("Account Not Found !!!")
         return
     else:  
-        New_Balance = int(Balance)+ int(Amount)
-        x=Read_Balance_info() 
-        update=[]
-        for i in x:
-            b=i.split(",")
-            if Acc_number==b[0]:
-                b[2]= str (New_Balance)
-                #x.remove(i)
-                print(f"Your Deposit is sucessful \n Your new Balance is {New_Balance}.")
-                break
-            
-            """file = open ("Balance_info.txt","w")
-            for a in x :
-                file.write (x)
-            file.close()"""
-            
-            
-        update.append (",".join(b))
-        file =open("Balance_info.txt","a")
-        file.write("".join(update))
-        file.close() 
-        find_user(Acc_number)
-        Regenerate_Numbers()                
+        New_Balance= int(Balance) + int(Amount)
+        M[2] = New_Balance
+        file = open("Balance_Info.txt","a")
+        for i in M:
+            M.pop()
+            file .write (f"{i},")
+        file.write ("\n")
+        file .close ()
+        print(M)  
 ###.........................................Function for Withdraw ......................### 
 def Withdraw(Amount):
     global Ac_No,User_Id ,Customer_Id,Admin_Id
@@ -433,7 +431,10 @@ def Second_Interface ():
     while True:
         print("1 = Admin Account ")
         print("2 = Customer Account ")
-        INTPUT=int(input("Enter the Interface Number "))
+        try :
+            INTPUT=int(input("Enter the Interface Number "))
+        except ValueError:
+            print("Enter numbers only !!!")
         if INTPUT==1 :
             file =open ("Admin_Infomation.txt","r")
             Admin_info = file .readline()
