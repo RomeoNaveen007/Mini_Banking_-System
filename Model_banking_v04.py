@@ -61,9 +61,6 @@ def Cu_numbers():
 def date_time():
     return datetime.date.today()
 
-####.....................Creating table ...........####
-def table(data, headers=["Account No:","Date","Amount","Balance"], tablefmt="grid"):
-    return tabulate(data, headers=headers, tablefmt=tablefmt)
 
 ###>>>>>>>>>>>>>>>>>>>>>>>>> Read Customer Info <<<<<<<<<<<####
 def Read_customer_info():
@@ -85,7 +82,7 @@ def Read_User_info():
     except FileNotFoundError :
         print("User_Info file not found !!!")
         return 
-###.......................Read balance info ............### 
+###......................Read balance info ............### 
 def Read_Balance_info():
     try:
         B_file= open("Balance_info.txt","r")
@@ -174,41 +171,6 @@ def New_Customer_Bank_Ac ():
                 Regenerate_Numbers()
                 break
         break
-    ###...........Creating function for password protection and balance return  for customer menu.........###
-def Customer_check(Ac_No,name):     ##################### SHOULD CHECK THIS <<<<<<<<<<<<<<<<<<<<<#################
-    Cu = Read_customer_info()
-    for i in Cu:
-        a=i.split(",")
-        if Ac_No ==a[6] and name==a[2] :
-            print(f"Your Account Number and Name is Correct !!! \n Welcome {name} !!!")
-            u = Read_User_info ()
-            for j in u :
-                m=j.split(",")
-                if j[0] ==a[7]:
-                    #print(m)
-                    attempt =2
-                    while attempt <3:
-                        try :
-                            Pass = int (input("enter the Passward :"))
-                            if Pass == m[3]:
-                                print ("Your Password is Correct!!!")
-                                Ba = Read_Balance_info()
-                                for h in Ba :
-                                    q = h.split (",")
-                                    if q[0]== m[3]:
-                                        return q[2]
-                            else :
-                                print("Incorrect password!!!")
-                        except ValueError :
-                            print ("Enter Numbers only !!!")
-                        print(f"Attempt left is :{attempt}")
-                        attempt -=1
-        else :
-            print("Your Account Number and Name is Inccorrect !!!")
-            return
-        
-    
-                                        
  ###......... Get balance ...........###                 
 def get_Balance(Acc_number):     
     ba = Read_Balance_info()
@@ -256,14 +218,17 @@ def Deposit(Amount):
         print("Your Account not found !!!")
         
     else:
-        file = open ("Balance_info.txt","w")
-        file.writelines(Dep_List)
-        file .close ()
-        
-        H_file = open("History_info.txt","a")
-        H_file .write(f"{Acc_number},{now},{Amount},{New_Balance},\n")
-        H_file .close ()
-        
+        try :
+            file = open ("Balance_info.txt","w")
+            file.writelines(Dep_List)
+            file .close ()
+            
+            H_file = open("History_info.txt","a")
+            H_file .write(f"{Acc_number},{now},{Amount},{New_Balance},\n")
+            H_file .close ()
+        except UnboundLocalError:
+            print ("File not found!!!")
+            
         find_user(Acc_number)
         Regenerate_Numbers()
                 
@@ -313,7 +278,11 @@ def Total_Balance():
 def Transfer_Money():
     global Ac_No,User_Id,Customer_Id,Admin_Id
     now = date_time()
-    Amount = int (input ("Enter the transfer Amount :"))
+    try :
+        Amount = int (input ("Enter the transfer Amount :"))
+    except ValueError :
+        print("Enter Numbers only !!!")
+        return
     Dep_Ac_no = input("Enter the depositer Account Number :")
     Rec_Ac_no = input("Enter the Reciver's Account Number : ")
     Dep_Balance =get_Balance(Dep_Ac_no)
@@ -400,6 +369,87 @@ def Delete (Ac_No):
     
     print("Account deleted Sucessfully !!!")
     
+###....................................................6. Total Transaction History ...................#######################
+def tot_trans_histroy():
+    with open ("History_info.txt","r") as file :
+        print(f"{'|Ac_No':<10}{'|Date':<12}{'|Amount':<15}{'|Balance':<20}|\n")
+        lines = file.readlines()
+        for line2 in lines:
+            line = line2.strip().split(',')
+            print(f"|{line[0]:<10}|{line[1]:<12}|{line[2]:<15}|{line[3]:<20}|\n")
+            
+####>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>C_1. Deposit Customer Ac  <<<<<<<<<<<<<<<<<<<<<<<<<<<#####
+def cus_Deposit(Amount,Acc_No):
+    global Ac_No,User_Id,Customer_Id,Admin_Id
+    now = date_time()
+    Balance = Read_Balance_info()
+    Dep_List = []
+    for i in Balance :
+        M= i .split (",")
+        if Acc_No== M[0]:
+            Old_Balance = M[2]
+            New_Balance = int (Amount) + int (Old_Balance)
+            M[2] = str(New_Balance)
+            print(f"Your amount is Deposited \n Your New Balance is {New_Balance}")
+            convert_str = ",".join(M)  # convert inti single string 
+            Dep_List.append(f"{convert_str}")   
+        
+        else :
+            Dep_List.append(i)
+    if Acc_No is None :
+        print("Your Account not found !!!")
+    else:
+        try :
+            file = open ("Balance_info.txt","w")
+            file.writelines(Dep_List)
+            file .close ()
+            
+            H_file = open("History_info.txt","a")
+            H_file .write(f"{Acc_No},{now},{Amount},{New_Balance},\n")
+            H_file .close ()
+        except UnboundLocalError:
+            print ("File not found!!!")
+            
+        find_user(Acc_No)
+        Regenerate_Numbers()
+        return
+          
+####>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>C_2. Withdraw Customer Account <<<<<<<<<<<<<<<<<<<<<<<<<<<#####
+def Cus_withdraw(Amount ,Acc_Num):
+    global Ac_No,User_Id,Customer_Id,Admin_Id
+    now = date_time()
+    Balance = Read_Balance_info()
+    update = []
+    for d in Balance:
+        e= d.split(",")
+        if Acc_Num == e[0]:
+            Old_Bal = e[2]
+            New_Bal = int (Old_Bal) - int (Amount)
+            e[2] = str(New_Bal)
+            print(f"Your Withdraw is Sucessfull \n Your New Balance is {New_Bal} \n Please Take your Cash !!!")
+            Con_str = ",".join(e)
+            update.append(f"{Con_str}") 
+            
+        else:
+            update.append(d)
+    if Acc_Num is None :
+        print("Your Account not found !!!")
+    else :
+        try :
+            file = open ("Balance_info.txt","w")
+            file .writelines(update)
+            file.close()
+            
+            H_file = open("History_info.txt","a")
+            H_file .write(f"{Acc_Num},{now},{Amount},{New_Bal},\n")
+            H_file .close ()
+        except FileNotFoundError :
+            print ("Account not found !!!")
+        
+        find_user(Acc_Num)
+        Regenerate_Numbers() 
+                
+    
 ####>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>C_3 . Check Individual Balance <<<<<<<<<<<<<<<<<<<<<<<<<<<#####
 def check_Cu_Balance (Ac_No):
     x = Read_Balance_info()
@@ -408,7 +458,16 @@ def check_Cu_Balance (Ac_No):
         if Ac_No == S[0]:
             print (f"Your Account Balance is : {S[2]}")
             break
-        
+    
+####>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>C_4 . Individual transaction history <<<<<<<<<<<<<<<<<<<<<<<<<<<#####
+def Indi_Trans_History(Ac_No):
+    with open ("History_info.txt","r") as file :
+        print(f"{'|Ac_No':<10}{'|Date':<12}{'|Amount':<15}{'|Balance':<20}|\n")
+        for lines in file:
+            line = lines.strip().split(',')
+            if line[0] == Ac_No:
+                print(f"|{line[0]:<10}|{line[1]:<12}|{line[2]:<15}|{line[3]:<20}|\n")
+                
 ###................................Admin Menu- Driven Interface .......................................................###
 
 def Admin_Menu():
@@ -451,14 +510,12 @@ def Admin_Menu():
             Transfer_Money()
             
         elif Menu_Num==6:
-            H = Read_History_info()
-            output = table(H)     ######>>>>>>>>>>> Should formate table better <<<<<<<<<<<####$
-            print(output)
+            tot_trans_histroy()
             
         elif Menu_Num==7:
             Ac_No = input("Enter the Account Number to Delete :")
             Delete (Ac_No)
-                        
+                    
         elif Menu_Num==8 :
             Admin()
             
@@ -469,11 +526,7 @@ def Admin_Menu():
             break
             
 ###................................Customer Menu- Driven Interface .......................................................###
-def Customer_Menu():
-    Ac_No = input("Enter the Account number : : ")
-    name = input("Enter the Name : ")
-    Customer_check(Ac_No,name)
-        
+def Customer_Menu():      
     while True:
         print("Customer Menu number :")
         print(" 1= Deposit Money ")
@@ -482,34 +535,47 @@ def Customer_Menu():
         print(" 4= Individual Transaction History ")
         print(" 5= Transfer Money ")
         C_num =int (input("Enter the customer Menu number :"))  
-       
+        
         if C_num ==1 :
             try :
+                Ac_No = input("Enter the Account number : : ")
                 Amount =  input ("Enter the Amount to Deposit :")
-                Deposit(Amount) 
-                
+                cus_Deposit(Amount, Ac_No)     
+            
+            except ValueError:
+                print("Enter Numbers only !!!") 
+
+        elif C_num ==2:
+            try :
+                Ac_No = input("Enter the Account number : : ")         
+                Amount =  input ("Enter the Amount to Deposit :")
+                Cus_withdraw(Amount, Ac_No)
             except ValueError:
                 print("Enter Numbers only !!!")  
                 
-        elif C_num ==2:
-            try :
-                Amount = int (input ("Enter the Amount to Withdraw :"))
-                Withdraw(Amount)
-                
-            except ValueError:
-                print("Enter Numbers only !!!") 
-                
         elif C_num==3:
+            try :
+                Ac_No = input("Enter the Account Number :")
+            except ValueError :
+                print("Your Account Not Found !!!")
             check_Cu_Balance(Ac_No)
 
         elif C_num==4:
-            pass
+            try :
+                Ac_No = input("Enter the Account number :")
+                Indi_Trans_History(Ac_No)
+            
+            except ValueError:
+                print("Enter Numbers only !!!") 
+           
         elif C_num ==5:
-            pass
+            Transfer_Money()
+            
         elif C_num==6 :
             break
         else :
             print("Invaalid Customer menu number !!!")
+                
 
              
 #................Creating Admin Account ..........#
@@ -545,7 +611,7 @@ def First_Interface():
            
 def Second_Interface ():
     while True:
-        print("1 = Admin Account \n 2 = Customer Account \n 3 = Exit ")
+        print(" 1 = Admin Account \n 2 = Customer Account \n 3 = Exit ")
         try :
             INTPUT=int(input("Enter the Interface Number :"))
         except ValueError:
@@ -573,7 +639,7 @@ def Second_Interface ():
             
         elif INTPUT==3 :
             print ("Thank You for Banking !!!")
-    pass
+            break
         
 i=0 
 try :
