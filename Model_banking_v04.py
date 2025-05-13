@@ -334,29 +334,34 @@ def tot_trans_histroy():
         line = line2.strip().split(',')
         print(f"|{line[0]:<10}|{line[1]:<12}|{line[2]:<15}|{line[3]:<20}|\n")            
 #########>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Check Customer login <<<<<<<<<<<<<<<<<<<<<<<<<<##########
-def Check_Customer_login():  
-    while True:
-        X =Read_User_info()
-        try :
-            User_id= input("Enter the User ID :")
-            Password = input("Enter the User Password :")
-        except ValueError :
-            print("Enter numbers only !!!")
-            continue
-        for i in X :
-            user = i.strip().split (",")
-            if user[0] == User_id and user[3]== Password :
-                print("Your User ID and Password is correct !!!")  
-                print(f"Welcome {user[2]} !!!")
-                Y = Read_customer_info()
-                for j in Y:
-                    Ad_id = j.strip().split(",")
-                    if user[0]== Ad_id[7]:
-                        return Ad_id[6]
-                                               
-        else :
-            print ("Incorrect User ID and Password !!!")
-            continue 
+def Check_Customer_login(): 
+    attempt =2
+    while  attempt >0: 
+        while True:
+            X =Read_User_info()
+            try :
+                User_id= input("Enter the User ID :")
+                Password = input("Enter the User Password :")
+            except ValueError :
+                print("Enter numbers only !!!")
+                continue
+            for i in X :
+                user = i.strip().split (",")
+                if user[0] == User_id and user[3]== Password :
+                    print("Your User ID and Password is correct !!!")  
+                    print(f"Welcome {user[2]} !!!")
+                    Y = Read_customer_info()
+                    for j in Y:
+                        Ad_id = j.strip().split(",")
+                        if user[0]== Ad_id[7]:
+                            return Ad_id[6]                                              
+            else :
+                print ("Incorrect User ID and Password !!!")
+                print (f"Attempt left is :{attempt}")
+                attempt = attempt-1
+            if attempt== 0:
+                break 
+            
 ####>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>C_3 . Check Individual Balance <<<<<<<<<<<<<<<<<<<<<<<<<<<#####
 def check_Cu_Balance (Ac_No):
     x = Read_Balance_info()
@@ -531,7 +536,7 @@ def Second_Interface ():
                 for k in Admin_info :
                     l= k.split(",")
                     if Ad_Id== l[2] and Ad_pass== l[3]:
-                        print("Welcome Admin!!!")
+                        print(f"Welcome {Ad_Id} !!!")
                         Admin_Menu()     
                                
                 else :
@@ -543,21 +548,8 @@ def Second_Interface ():
             
         elif INTPUT==3 :
             print ("Thank You for Banking !!!")
-            break
+            exit()
         
-i=0 
-try :
-    while True:
-        if i==0:    
-            First_Interface()
-            i +=1
-        
-        else :
-            Second_Interface()    #### End the sesion when giving 2 times exit ####
-            break
-        
-finally :
-    Regenerate_Numbers()
-             
-        
-        
+
+    
+First_Interface()
