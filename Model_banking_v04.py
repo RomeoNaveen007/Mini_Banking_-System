@@ -1,6 +1,6 @@
 import os 
 import datetime
-from tabulate import tabulate
+#from tabulate import tabulate
 def Read_Gen_num():
     file =open("Genarate_numbers.txt","r")
     X = file.readlines()
@@ -181,16 +181,19 @@ def Deposit(Amount,Acc_number):
     Dep_List = []
     for i in Balance :
         M= i .split (",")
-        if Acc_number== M[0]:
+        if Acc_number== M[0] :
             Old_Balance = M[2]
-            New_Balance = int (Amount) + int (Old_Balance)
-            M[2] = str(New_Balance)
-            print(f"Your amount is Deposited \n Your New Balance is {New_Balance}")
-            convert_str = ",".join(M)
-            Dep_List.append(f"{convert_str}")   
-        
+            if int(Old_Balance )> 0 :
+                New_Balance = int (Amount) + int (Old_Balance)
+                M[2] = str(New_Balance)
+                print(f"Your amount is Deposited \n Your New Balance is {New_Balance}")
+                convert_str = ",".join(M)
+                Dep_List.append(f"{convert_str}")   
+            else :
+                print("Invalid Amount !!!")
+                return
         else :
-            Dep_List.append(i)
+            Dep_List.append(i)           
     if Acc_number is None :
         print("Your Account not found !!!")
     else:
@@ -212,15 +215,19 @@ def Withdraw(Amount,Acount_num):
     update = []
     for d in Balance:
         e= d.split(",")
-        if e[0] == Acount_num and e[2] <str(Amount) :
-            Old_Bal = e[2]
-            New_Bal = int (Old_Bal) - int (Amount)
-            e[2] = str(New_Bal)
-            print(f"Your Withdraw is Sucessfull \n Your New Balance is {New_Bal} \n Please Take your Cash !!!")
-            Con_str = ",".join(e)
-            update.append(f"{Con_str}") 
+        if e[0] == Acount_num :
+            if  int(e[2]) < Amount:
+                Old_Bal = e[2]
+                New_Bal = int (Old_Bal) - int (Amount)
+                e[2] = str(New_Bal)
+                print(f"Your Withdraw is Sucessfull \n Your New Balance is {New_Bal} \n Please Take your Cash !!!")
+                Con_str = ",".join(e)
+                update.append(f"{Con_str}") 
+            else :
+                print("Amount is greater than Balance !!!")
+            return
         else:
-            update.append(d)
+            update.append(d)     
     if Acount_num is None :
         print("Your Account not found !!!")
     else :
@@ -394,7 +401,11 @@ def Admin_Menu():
             try :
                 Amount = int (input ("Enter the Amount to Deposit :"))
                 Acount_num = input("Enter the Account Number :")
-                Deposit(Amount,Acount_num)
+                if Amount<0 :
+                    print("Try Again !!! \n Amount is less than Zero")
+                    continue 
+                else :
+                    Deposit(Amount,Acount_num)
             except ValueError:
                 print("Enter Numbers only !!!")  
                            
@@ -402,7 +413,10 @@ def Admin_Menu():
             try :
                 Amount = int (input ("Enter the Amount to Withdraw :"))
                 Acount_num = input("Enter the Account Number :")
-                Withdraw(Amount,Acount_num)
+                if Amount<0 :
+                    print("Try Again !!! \n Amount is less than Zero")
+                else :
+                    Withdraw(Amount,Acount_num)
             except ValueError:
                 print("Enter Numbers only !!!") 
                 
@@ -497,15 +511,17 @@ def Admin ():
             now= date_time()
             Admin_Id = Ad_numbers()
             User_Id =Us_numbers()
-            
-            with open ("Admin_Infomation.txt","a") as file :
-                file.write(f"Ad{Admin_Id},{now},{Admin_Name},{Admin_Password},U{User_Id},\n")
-            
-            with open("User_Info.txt","a") as file :
-                file.write(f"U{User_Id},{now},{Admin_Name},{Admin_Password},\n")
+            try :
+                with open ("Admin_Infomation.txt","a") as file :
+                    file.write(f"Ad{Admin_Id},{now},{Admin_Name},{Admin_Password},U{User_Id},\n")
                 
+                with open("User_Info.txt","a") as file :
+                    file.write(f"U{User_Id},{now},{Admin_Name},{Admin_Password},\n")
+            except FileNotFoundError:
+                print ("file Not Found !!!")
             Regenerate_Numbers()
-            break
+            Second_Interface()
+            
         else:
             print("Password is not match !!!")
             continue
