@@ -99,12 +99,20 @@ def Read_History_info():
     except FileNotFoundError :
         print("History_info file not found !!!")
         return
+    
+#############>>>>>>>>>>>>>>upper Case function <<<<<<<<<<<<<<<<###########
+def Upper_Case(First_Name,Second_Name):
+    Full_Name = First_Name+""+Second_Name
+    return Full_Name.title()
+    
 #.................................................Creating New customer Account ....................................#
 def New_Customer_Bank_Ac ():
     
     while True :
         try:
-            Name = input ("Enter the Name: ")
+            First_Name = str (input ("Enter the First Name: "))
+            Second_Name = str(input ("Enter the Second Name: "))
+            Name = Upper_Case(First_Name,Second_Name)        
             Age =int(input ("Enter the Age :"))
             Gender = input("Male or Female :")
             Address = input("Enter the Address: ")
@@ -116,8 +124,8 @@ def New_Customer_Bank_Ac ():
         #.......Password varification ........#
         while True:
             try:
-                Password = int (input ("Enter 4 digit number password : ") )
-                Conform_Password = int(input("Reenter the 4 digit number Password "))
+                Password = str (input ("Enter 6 or more digit password : ") )
+                Conform_Password = str(input("Reenter the 6 or more digit  Password "))
                 change = input ("Type Yes if any changes ,if not No :" )
             except ValueError:
                 print("Enter numbers only!!!") 
@@ -125,8 +133,7 @@ def New_Customer_Bank_Ac ():
             if change == "Yes" or change == "yes" :
                 print("Please Re-enter carefully !!!")
                 return       
-            else :
-                Password==Conform_Password and Password>999 and Password < 10000
+            elif change =="No" or change == "no" and Password==Conform_Password and len(Password) >= 6:
                 print ("Your Account is created Sucessfully..")
                 Ac_No =Ac_numbers()
                 Us_Id =Us_numbers()
@@ -147,6 +154,9 @@ def New_Customer_Bank_Ac ():
                     H_file .write(f"Ac{Ac_No},{now},{Amount},{Balance},\n")
                     Regenerate_Numbers()
                 break
+            else :
+                print("Enter the Password with more or equal to 6 digits !!! ")
+                
         break
  ###......... Get balance ...........###                 
 def get_Balance(Acc_number):     
@@ -311,24 +321,32 @@ def Transfer_Money(Dep_Ac_no):
 def Delete (Ac_No):
     N = Read_customer_info()
     M= Read_Balance_info()
-    for j in M :
-        y = j.split (",")
-        if Ac_No == y[0]:
-            U = y[3]
-            M.remove (j)
-            break
-    for i in N :
-        x = i .split(",")
-        if U == x[7] :
-            N.remove(i)
-            break           
-    if Ac_No is None :
-        print("Account Number Not Found !!!")
-    with open ("Balance_info.txt","w") as file :
-        file .writelines(M)
-    with open ("Customer_Info.txt","w")as file_c:
-        file_c.writelines(N)
-    print("Account deleted Sucessfully !!!") 
+    try :
+        conform = input ("Conform Your Deletion by typing YES if Not NO ")
+    except ValueError:
+        print("Enter correctly !!!")
+    if conform == "YES" or conform== "yes" :
+        for j in M :
+            y = j.split (",")
+            if Ac_No == y[0]:
+                U = y[3]
+                M.remove (j)
+                break
+        for i in N :
+            x = i .split(",")
+            if U == x[7] :
+                N.remove(i)
+                break           
+        if Ac_No is None :
+            print("Account Number Not Found !!!")
+        with open ("Balance_info.txt","w") as file :
+            file .writelines(M)
+        with open ("Customer_Info.txt","w")as file_c:
+            file_c.writelines(N)
+        print("Account deleted Sucessfully !!!") 
+    else :
+        print("Account Not deleted !!!")
+        return
 ###....................................................6. Total Transaction History ...................#######################
 def tot_trans_histroy():
     try :
@@ -339,7 +357,8 @@ def tot_trans_histroy():
         print("History_info file not found !!!") 
     for line2 in lines:
         line = line2.strip().split(',')
-        print(f"|{line[0]:<10}|{line[1]:<12}|{line[2]:<15}|{line[3]:<20}|\n")            
+        print(f"|{line[0]:<10}|{line[1]:<12}|{line[2]:<15}|{line[3]:<20}|\n")  
+
 #########>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Check Customer login <<<<<<<<<<<<<<<<<<<<<<<<<<##########
 def Check_Customer_login(): 
     attempt =2
@@ -389,7 +408,7 @@ def Indi_Trans_History(Ac_No):
 def Admin_Menu():
     while True :
         print("Admin Menu number :") 
-        print(" 1= Create Account \n 2= Deposit Money \n 3= Withdraw Money \n 4= Check Total Balance \n 5= Transfer Money \n 6= Total Transaction History \n 7= Delate Account \n 8= Add Admin \n 9= Exit ") 
+        print(" 1= Create Account \n 2= Deposit Money \n 3= Withdraw Money \n 4= Check Total Balance \n 5= Transfer Money \n 6= Total Transaction History \n 7= Delate Account \n 8= Add Admin \n 9= Exit \n 10= Display Customer List ") 
         try :
             Menu_Num = int(input ("Enter the Admin Menu Number :"))
         except ValueError :
